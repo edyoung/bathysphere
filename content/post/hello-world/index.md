@@ -1,20 +1,15 @@
 ---
-title: Hello World
-description: Welcome to Hugo Theme Stack
+title: Bathysphere.org
+description: Personal blog and web site of Edwin Young
 slug: hello-world
-date: 2022-03-06 00:00:00+0000
+date: 2025-03-30 00:00:00+0000
 image: floral10.png
-categories:
-    - Example Category
 tags:
-    - Example Tag
+    - intro
 weight: 1       # You can add weight to some posts to override the default sorting (date descending)
 ---
 
-Welcome to Hugo theme Stack. This is your first post. Edit or delete it, then start writing!
+Infrequently-updated posts by Edwin Young (a software engineer, not a preacher). I work at Microsoft on Azure, 
+but this is a personal, unofficial site. Most images on this site are generated using a side-project of mine, 
+https://fract4d.github.io/gnofract4d 
 
-For more information about this theme, check the documentation: https://stack.jimmycai.com/
-
-Want a site like this? Check out [hugo-theme-stack-stater](https://github.com/CaiJimmy/hugo-theme-stack-starter)
-
-> Photo by [Pawel Czerwinski](https://unsplash.com/@pawel_czerwinski) on [Unsplash](https://unsplash.com/)
