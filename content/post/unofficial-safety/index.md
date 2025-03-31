@@ -15,7 +15,7 @@ But there are also cases where general-purpose software can wind up in a situati
 
 For example, a web search turns up many resources like https://www.snprs.scot.nhs.uk/?page_id=635, which contains an Excel spreadsheet for calculating drug dosages, including for dangerous medications like fentanyl. If there are errors either in the Excel application itself, or in the spreadsheet, it doesn't seem like a stretch to say that could kill a child. It's not surprising that the web page says **"Disclaimer: this drug calculator is intended as an aid to management and must AT ALL TIMES be used in conjunction with local drug preparation, checking and administration policies"**
 
-![A spreadsheet showing how to calculate dosages](dosage.png)
+![A screenshot of a spreadsheet for calculating drug dosages](dosage.png)
 
 I don't mean by this to call out either the people who made this calculator, or Microsoft, as having done something wrong. I don't have any firm conclusions at all, but likely this is a lot safer than calculating things by hand.
 
