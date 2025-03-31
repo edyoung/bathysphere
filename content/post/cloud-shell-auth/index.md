@@ -1,15 +1,13 @@
-+++
-author = "Edwin Young"
-categories = ["Azure", "CloudShell"]
-date = "2021-03-19"
-description = "Describes how authentication works inside Azure Cloud Shell"
-#featured = ""
-#featuredalt = ""
-#featuredpath = ""
-#linktitle = ""
-title = "Azure Cloud Shell, az login, and Managed Identity"
-type = "post"
-+++
+---
+title: Azure Cloud Shell, az login, and Managed Identity
+description: Describes how authentication works inside Azure Cloud Shell
+slug: cloud-shell-auth
+date: 2021-03-19 00:00:00+0000
+image: agenda.png
+tags:
+    - Azure
+    - CloudShell
+---
 
 When you open Azure Cloud Shell and run `Get-AzVM` or `az vm list` for the first time, it works right away. But why?
 
