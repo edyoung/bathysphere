@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CloudShell on Bathysphere.org</title><link>https://www.bathysphere.org/tags/cloudshell/</link><description>Recent content in CloudShell on Bathysphere.org</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 19 Mar 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bathysphere.org/tags/cloudshell/index.xml" rel="self" type="application/rss+xml"/><item><title>Azure Cloud Shell, az login, and Managed Identity</title><link>https://www.bathysphere.org/p/cloud-shell-auth/</link><pubDate>Fri, 19 Mar 2021 00:00:00 +0000</pubDate><guid>https://www.bathysphere.org/p/cloud-shell-auth/</guid><description>&lt;img src="https://www.bathysphere.org/p/cloud-shell-auth/agenda.png" alt="Featured image of post Azure Cloud Shell, az login, and Managed Identity" />&lt;p>When you open Azure Cloud Shell and run &lt;code>Get-AzVM&lt;/code> or &lt;code>az vm list&lt;/code> for the first time, it works right away. But why?&lt;/p>
+&lt;p>That may seem like an odd question. Of course it should work right away! But it doesn&amp;rsquo;t work quite the same way when you run PowerShell or Azure CLI locally - you need to run &lt;code>Connect-AzAccount&lt;/code> or &lt;code>az login&lt;/code> first. So what&amp;rsquo;s the difference?&lt;/p>
+&lt;p>A surprising amount of things are happening behind the scenes for this to work, and at the time of writing there are some limitations you might hit. This post tries to explain what is going on. If you just want to use Cloud Shell you don&amp;rsquo;t really need to know any of this.&lt;/p>
+&lt;h2 id="oauth">OAuth
+&lt;/h2>&lt;p>Within Azure, basically everything is authenticated using &lt;strong>OAuth&lt;/strong>. That&amp;rsquo;s a complicated beast I can&amp;rsquo;t explain here in detail. The docs &lt;a class="link" href="https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-vs-authorization" target="_blank" rel="noopener"
+>here&lt;/a> provide a reasonable starting point. For our purposes, the important thing is that you authenticate yourself first to Azure Active Directory when you open the Azure Portal. AAD checks your password/PIN+smart card/whatever and issues a &lt;strong>refresh token&lt;/strong>. This gets stored outside our scope in the browser - Cloud Shell never accesses it directly.&lt;/p>
+&lt;p>When you need to access a particular resource, you need an &lt;strong>access token&lt;/strong>. Given the refresh token, you ask AAD &amp;lsquo;hey, I want to access Azure Storage, can I have a token?&amp;rsquo;. AAD then sends you a short-lived token (usually lasting 1 hour) which can then be presented to Azure Storage; storage checks the signature on the token and uses that to check if you are legit.&lt;/p>
+&lt;p>But as I mentioned, in Cloud Shell we don&amp;rsquo;t have your refresh token, so how does this work?&lt;/p>
+&lt;h2 id="managed-identity">Managed Identity
+&lt;/h2>&lt;p>&lt;strong>Managed Identity&lt;/strong> is a cool scheme invented so that code which needs to access a resource doesn&amp;rsquo;t need to store (and worry about the security and rotation of) a password. The Azure fabric manages an identity and is configured so that any code that runs on a particular VM can ask an endpoint &amp;ldquo;Can I have an access token?&amp;rdquo;. I think of this as an ambient credential for the VM - we grant that machine access to resources and allow code running on it to get tokens without any extra hassle.&lt;/p>
+&lt;p>This works by having a special endpoint. If you&amp;rsquo;re on an Azure VM with a managed identity, you can run&lt;/p>
+&lt;p>&lt;code>curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&amp;amp;resource=https%3A%2F%2Fmanagement.azure.com%2F' -H Metadata:true&lt;/code>&lt;/p>
+&lt;p>and get a token, which is just a JSON blob looking a bit like this:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;accessToken&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;eyJ0blah...&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;expiresOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2021-03-19 23:12:01.371124&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;subscription&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;b1071e00-5da5-49c8-b902-14951e12f37a&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;tenant&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;72f988bf-86f1-41af-91ab-2d7cd011db47&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;tokenType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Bearer&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="managed-identity-in-cloud-shell">Managed Identity in Cloud Shell
+&lt;/h2>&lt;p>In Cloud Shell you still want an &amp;lsquo;ambient&amp;rsquo; identity - you don&amp;rsquo;t want to sign on &lt;em>again&lt;/em>. But you don&amp;rsquo;t want a token that identifies you as the machine where Cloud Shell runs, you want one based on your own identity that you signed on to the portal with.&lt;/p>
+&lt;p>So we provide an alternative managed identity endpoint.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl &lt;span class="s1">&amp;#39;http://localhost:50342/metadata/identity/oauth2/token?api-version=2018-02-01&amp;amp;resource=https%3A%2F%2Fmanagement.azure.com%2F&amp;#39;&lt;/span> -H Metadata:true
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Will give you an access token based on your own identity. Unlike Azure&amp;rsquo;s regular managed identity endpoint, this is implemented as another process running inside your container.
+When it gets a request, it actually sends the request back to your browser, which forwards it to the parent Portal frame, which makes a request to AAD, and the resulting token
+flows back down the same path.&lt;/p>
+&lt;h2 id="tool-considerations">Tool Considerations
+&lt;/h2>&lt;p>Client tools deal with this endpoint in different ways.&lt;/p>
+&lt;p>Azure PowerShell supports &lt;code>Connect-AzAccount -Identity&lt;/code> which tells it to use managed identity (whether Cloud Shell or regular); AZ CLI has &lt;code>az login --identity&lt;/code> for the same purpose. We run both during the Cloud Shell startup so you don&amp;rsquo;t have to.&lt;/p>
+&lt;p>You can also login explicitly, by running &lt;code>az login&lt;/code> or &lt;code>Connect-AzAccount&lt;/code>. That overrides this mechanism and can be used to (for example) use a different identity than the one you logged on to Cloud Shell with.&lt;/p>
+&lt;h2 id="limitations-and-issues">Limitations and Issues
+&lt;/h2>&lt;p>This works great most of the time, but there are a couple of snags you might run into.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>We have an allow-list of resources that we can provide tokens for (a limitation we hope to raise in future). This means that when someone introduces a brand new resource type for a new service, we have to update the list in Cloud Shell too. If you run a command and see something like this: &lt;code>&amp;quot;error&amp;quot;:{&amp;quot;code&amp;quot;:&amp;quot;AudienceNotSupported&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Audience https://coolnewservice.azure.com/ is not a supported MSI token audience....&amp;quot;}&amp;quot;&lt;/code> you have hit this issue. Please feel free to file an issue at &lt;a class="link" href="https://github.com/Azure/CloudShell/issues" target="_blank" rel="noopener"
+>https://github.com/Azure/CloudShell/issues&lt;/a> and we&amp;rsquo;ll endeavor to add it as soon as we can.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>If you login explicitly (&lt;code>az login&lt;/code>) any Conditional Access rules your company may have in place will be evaluated based on the Cloud Shell container rather than the machine where your browser runs. The Cloud Shell container doesn&amp;rsquo;t count as a managed device for these policies so rights may be limited by the policy.&lt;/p>
+&lt;/li>
+&lt;/ol></description></item></channel></rss>
