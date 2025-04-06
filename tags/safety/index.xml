@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Safety on Bathysphere.org</title><link>https://www.bathysphere.org/tags/safety/</link><description>Recent content in Safety on Bathysphere.org</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 30 Mar 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bathysphere.org/tags/safety/index.xml" rel="self" type="application/rss+xml"/><item><title>Unofficial Safety-Critical Software</title><link>https://www.bathysphere.org/p/unofficial-safety/</link><pubDate>Sun, 30 Mar 2025 00:00:00 +0000</pubDate><guid>https://www.bathysphere.org/p/unofficial-safety/</guid><description>&lt;img src="https://www.bathysphere.org/p/unofficial-safety/safety.jpg" alt="Featured image of post Unofficial Safety-Critical Software" />&lt;p>Some computer systems are obviously safety-critical. If you are working on flight-control software for Boeing or Airbus, everyone involved is aware that mistakes in this program could cause loss of life. So software like this is written very, very carefully - extremely detailed specifications, often proofs of correctness using a theorem prover, exhaustive testing, and so on.&lt;/p>
+&lt;p>But there are also cases where general-purpose software can wind up in a situation where bugs could cause dangerous consequences. I&amp;rsquo;m using &amp;ldquo;unofficial safety-critical software&amp;rdquo; quite loosely to refer to refer to this.&lt;/p>
+&lt;p>For example, a web search turns up many resources like &lt;a class="link" href="https://www.snprs.scot.nhs.uk/?page_id=635" target="_blank" rel="noopener"
+>https://www.snprs.scot.nhs.uk/?page_id=635&lt;/a>, which contains an Excel spreadsheet for calculating drug dosages, including for dangerous medications like fentanyl. If there are errors either in the Excel application itself, or in the spreadsheet, it doesn&amp;rsquo;t seem like a stretch to say that could kill a child. It&amp;rsquo;s not surprising that the web page says &lt;strong>&amp;ldquo;Disclaimer: this drug calculator is intended as an aid to management and must AT ALL TIMES be used in conjunction with local drug preparation, checking and administration policies&amp;rdquo;&lt;/strong>&lt;/p>
+&lt;p>&lt;img src="https://www.bathysphere.org/p/unofficial-safety/dosage.png"
+width="1423"
+height="1136"
+srcset="https://www.bathysphere.org/p/unofficial-safety/dosage_hu_ece146b3427a9959.png 480w, https://www.bathysphere.org/p/unofficial-safety/dosage_hu_8fe9364a116f447a.png 1024w"
+loading="lazy"
+alt="A screenshot of a spreadsheet for calculating drug dosages"
+class="gallery-image"
+data-flex-grow="125"
+data-flex-basis="300px"
+>&lt;/p>
+&lt;p>I don&amp;rsquo;t mean by this to call out either the people who made this calculator, or Microsoft, as having done something wrong. I don&amp;rsquo;t have any firm conclusions at all, but likely this is a lot safer than calculating things by hand.&lt;/p>
+&lt;p>But it raises some interesting questions.&lt;/p>
+&lt;ul>
+&lt;li>Is Excel &amp;ldquo;unofficial safety-critical software&amp;rdquo;? Is the spreadsheet itself USCC?&lt;/li>
+&lt;li>How about any sufficiently-powerful program, like a programming language or MATLAB, which could be used for life-or-death calculations?&lt;/li>
+&lt;li>If calculating dosages in a spreadsheet is too dangerous, what would we recommend instead?&lt;/li>
+&lt;li>How do we distribute responsibility for correctness between Excel, the spreadsheet author, and the physician using the spreadsheet? Excel&amp;rsquo;s EULA and the web page disclaimer push the responsibility entirely to the end user. Is that reasonable?&lt;/li>
+&lt;li>Is the software I work on unofficially safety-critical? Should that change my approach?&lt;/li>
+&lt;/ul></description></item></channel></rss>
