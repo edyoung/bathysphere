@@ -3,7 +3,6 @@ title: "Azcli_and_azurepowershell_context"
 date: 2020-09-07T17:11:06-07:00
 draft: false
 author: "Edwin Young"
-categories: ["Azure","azcli","PowerShell"]
 tags: ["tip","azure","azcli","PowerShell"]
 description: "Explains the difference in how context is handled between AZ CLI and Azure PowerShell"
 #featured = "pic03.jpg"

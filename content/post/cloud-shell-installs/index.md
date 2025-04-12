@@ -1,6 +1,6 @@
 +++
 author = "Edwin Young"
-categories = ["Azure", "CloudShell", "PowerShell", "bash"]
+tags = ["Azure", "CloudShell", "PowerShell", "bash"]
 date = "2020-09-21T18:11:06-07:00"
 description = "How to install your own versions of tools in Azure Cloud Shell"
 slug = "cloud-shell-installs"

@@ -1,6 +1,6 @@
 +++
 author = "Edwin Young"
-categories = ["Azure", "CloudShell"]
+tags = ["Azure", "CloudShell"]
 date = "2021-05-25"
 description = "How Azure Cloud Shell stores your files"
 slog = "cloud-shell-files"
