@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TITANO on Bathysphere.org</title><link>https://www.bathysphere.org/tags/titano/</link><description>Recent content in TITANO on Bathysphere.org</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 26 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bathysphere.org/tags/titano/index.xml" rel="self" type="application/rss+xml"/><item><title>Financial Perpetual Motion</title><link>https://www.bathysphere.org/p/financial-perpetual-motion/</link><pubDate>Sat, 26 Mar 2022 00:00:00 +0000</pubDate><guid>https://www.bathysphere.org/p/financial-perpetual-motion/</guid><description>&lt;img src="https://www.bathysphere.org/p/financial-perpetual-motion/image.png" alt="Featured image of post Financial Perpetual Motion" />&lt;h1 id="financial-perpetual-motion">Financial Perpetual Motion
+&lt;/h1>&lt;p>Every so often, someone claims to have created a &lt;a class="link" href="https://newspunch.com/incredible-scientist-makes-free-energy-perpetual-motion-generator/" target="_blank" rel="noopener"
+>perpetual motion machine&lt;/a>, or a source of free energy - some kind of contraption which does work without any external power source. Anyone with a physics background knows that this is impossible due to the laws of thermodynamics, but these claims still find a small credulous audience. Normally the device is accompanied by lots of handwaving to obscure the fact that it can&amp;rsquo;t possibly work.&lt;/p>
+&lt;p>I&amp;rsquo;ve recently noticed a number of crypto projects which are IMHO &amp;lsquo;Financial Perpetual Motion Machines&amp;rsquo;. They claim to produce free money, without any form of actual revenue. Perhaps because the laws of finance are not quite as clear-cut or widely understood as thermodynamics, these projects have gained more attention from speculators than they deserve.&lt;/p>
+&lt;p>This is my attempt to explain &lt;em>why&lt;/em> these projects are Financial Perpetual Motion Machines (FPMMs), using &lt;a class="link" href="https://titano.finance/" target="_blank" rel="noopener"
+>Titano&lt;/a> as an example. There are many others like &lt;a class="link" href="https://www.coingecko.com/en/coins/wonderland" target="_blank" rel="noopener"
+>Wonderland&lt;/a> or &lt;a class="link" href="https://safuu.com/" target="_blank" rel="noopener"
+>Safuu&lt;/a> (which offers 383,000% interest!).&lt;/p>
+&lt;h2 id="what-is-titano">What is Titano?
+&lt;/h2>&lt;p>Titano says it is &amp;ldquo;The Best Auto-Staking &amp;amp; Auto-Compounding Protocol in Crypto&amp;rdquo;, and advertises an eye-catching &amp;ldquo;102,483% APY&amp;rdquo;. You buy some Titano tokens, and like a bank they pay you interest - you get more tokens each day (in fact, every 30 minutes) that you continue to hold them. Unlike a bank, you get 100,000% interest, instead of about 1% for a savings account. This is so much interest that if you start with $1,000 of Titano and hold it for one year, you wind up with over $1,000,000. 😲 This sounds pretty good! Unfortunately, it is too good to be true, as we will see.&lt;/p>
+&lt;h2 id="compound-interest">Compound interest
+&lt;/h2>&lt;p>Our first red flag is just to do the math for a few years. Let&amp;rsquo;s imagine you buy 1000 tokens and hold.&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>Year&lt;/th>
+&lt;th>Tokens&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>0&lt;/td>
+&lt;td>1,000&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>1&lt;/td>
+&lt;td>1,024,830&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>2&lt;/td>
+&lt;td>1,050,276,000&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>3&lt;/td>
+&lt;td>1,076,354,895,000&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>In other words, you can be a token trillionaire in 3 short years! Does that sound plausible?&lt;/p>
+&lt;h2 id="loans-and-interest">Loans and interest
+&lt;/h2>&lt;p>More generally, say you have a great idea for a business, but no money right now. You can borrow money, and then when your great idea makes a profit, pay it back. This is the foundation of capitalism. However the person who lends you the money is taking a risk - maybe your idea isn&amp;rsquo;t so hot after all - so they want interest. You have to pay back more than you borrowed. Lots of factors affect the interest rate, but risk is probably the biggest. This is why, unfairly enough, if you have a high credit rating and can pay back your credit card easily you get a lower rate than someone with a bad credit rating. If you have really bad credit you might only be able to get a predatory payday loan, which can have interest rates as high as 400% to 700% APR.&lt;/p>
+&lt;p>Let&amp;rsquo;s apply this to Titano. If we regard Titano as a business venture, by purchasing tokens you are making them a loan, and they are paying you interest on it. Surprisingly they are willing to pay interest &lt;em>over 100 times higher than a payday loan&lt;/em>. This is our second red flag. Why would a borrower pay interest higher than they need to? I assume you would shop around for the best rate before taking out a mortgage. Are Titano offering this rate out of the kindness of their hearts, or because lending money to pseudonymous cryptobros without any kind of security is extremely risky?&lt;/p>
+&lt;h2 id="revenue">Revenue
+&lt;/h2>&lt;p>Assuming you are an honest business, your business plan must factor in making enough money to pay back the loans, including interest. If you have to pay 100% interest, any venture which makes less than 100% return over the same period is going to be a loss for you. Applying this to Titano, how do they make money?&lt;/p>
+&lt;p>&lt;strong>The only current source of revenue is a cut whenever someone buys or sells Titano.&lt;/strong> This is red flag #3, and to my mind the real reason to regard this as financial perpetual motion. A real venture needs to make money: for example, by lending money to others, like a bank does, or by making cars and selling them. Titano only makes money as a side-effect of people speculating on Titano. There is a &lt;a class="link" href="https://docs.titano.finance/roadmap" target="_blank" rel="noopener"
+>road map&lt;/a> but it doesn&amp;rsquo;t look like a business plan which actually makes any money, let alone 100,000% ROI. It&amp;rsquo;s worth recalling that no business in human history has produced that kind of return.&lt;/p>
+&lt;h2 id="exchange-rates-and-inflation">Exchange rates and inflation
+&lt;/h2>&lt;p>In the above discussion I assume that 1 Titano token has a constant price measured in &amp;lsquo;real terms&amp;rsquo;. (Feel free to quibble about how real the USD or the Euro are, if you like). This isn&amp;rsquo;t true, of course. You can regard Titano as a foreign currency with a floating exchange rate vs USD.&lt;/p>
+&lt;p>There is a way for Titano to pay 100,000% interest &lt;em>denominated in Titano&lt;/em> without a corresponding 100,000% increase in the value of the underlying venture: inflation. This is the approach taken by economic powerhouses such as &lt;a class="link" href="https://en.wikipedia.org/wiki/Hyperinflation_in_Zimbabwe" target="_blank" rel="noopener"
+>Zimbabwe&lt;/a> and &lt;a class="link" href="https://en.wikipedia.org/wiki/Hyperinflation_in_the_Weimar_Republic" target="_blank" rel="noopener"
+>Weimar-era Germany&lt;/a>. If the supply of Titano increases 1000x but the value of Titano the project remains static, you could expect the value of each token to drop by 1000x.&lt;/p>
+&lt;h2 id="conclusion">Conclusion
+&lt;/h2>&lt;p>To assess the plausibility of a perpetual motion machine, it&amp;rsquo;s easiest to go back to first principles: &lt;em>where does the energy come from?&lt;/em> If there&amp;rsquo;s no clear explanation, it&amp;rsquo;s baloney.&lt;/p>
+&lt;p>To decide whether a financial &amp;lsquo;innovation&amp;rsquo; like Titano is a legitimate venture or a FPMM, it&amp;rsquo;s easiest to go back to first principles: &lt;em>where does the money come from?&lt;/em> If there&amp;rsquo;s no clear explanation, this quickly makes it apparent there is nothing there. You can ignore all the waffle about treasuries, burns and risk-free value.&lt;/p>
+&lt;h2 id="epilog">Epilog
+&lt;/h2>&lt;p>Unspurprisingly, Titano shut down less than a year after this was written.&lt;/p></description></item></channel></rss>
