@@ -3,7 +3,6 @@ date = 2020-09-22T17:11:06-07:00
 draft = false
 slug = "azurearc-cheatsheet"
 author = "Edwin Young"
-categories = ["AzureArc","azcli","PowerShell"]
 tags = ["AzureArc","azure","azcli","PowerShell"]
 description = "Examples of how to do basic things using the az cli and Azure PowerShell modules for Azure Arc-enabled Servers"
 title = "Azure Arc command-line tools cheat sheet"
