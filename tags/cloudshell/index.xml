@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CloudShell on Bathysphere.org</title><link>https://www.bathysphere.org/tags/cloudshell/</link><description>Recent content in CloudShell on Bathysphere.org</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 25 May 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://www.bathysphere.org/tags/cloudshell/index.xml" rel="self" type="application/rss+xml"/><item><title>How Azure Cloud Shell stores your files</title><link>https://www.bathysphere.org/p/how-azure-cloud-shell-stores-your-files/</link><pubDate>Tue, 25 May 2021 00:00:00 +0000</pubDate><guid>https://www.bathysphere.org/p/how-azure-cloud-shell-stores-your-files/</guid><description>&lt;img src="https://www.bathysphere.org/p/how-azure-cloud-shell-stores-your-files/csfiles.png" alt="Featured image of post How Azure Cloud Shell stores your files" />&lt;p>The official information on Cloud Shell&amp;rsquo;s file storage is &lt;a class="link" href="https://docs.microsoft.com/en-us/azure/cloud-shell/persisting-shell-storage" target="_blank" rel="noopener"
+>here&lt;/a>. It&amp;rsquo;s good stuff, and covers most things you might like to know, take a look! This blog contains a few more behind-the-scenes details for the curious. NB: We might change this in the future, this isn&amp;rsquo;t guaranteed.&lt;/p>
+&lt;p>We can see from the docs that all your files are stored in an Azure File Share which belongs to you, and which you select when you first start CLoud Shell. But how do those files map to the directory layout you see in Cloud Shell?&lt;/p>
+&lt;p>You can see that there are several mount points set up:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">edwin@Azure:~$ df -H
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Filesystem Size Used Avail Use% Mounted on
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">overlay 52G 17G 36G 32% /
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs 68M &lt;span class="m">0&lt;/span> 68M 0% /dev
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs 2.1G &lt;span class="m">0&lt;/span> 2.1G 0% /sys/fs/cgroup
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/dev/sda1 52G 17G 36G 32% /home
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">shm 68M 8.2k 68M 1% /dev/shm
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">//csxxx.file.core.windows.net/cs-edyoung-microsoft-com-xxx 6.5G 5.4G 1.1G 84% /usr/csuser/clouddrive
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs 2.1G &lt;span class="m">0&lt;/span> 2.1G 0% /proc/acpi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs 2.1G &lt;span class="m">0&lt;/span> 2.1G 0% /proc/scsi
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tmpfs 2.1G &lt;span class="m">0&lt;/span> 2.1G 0% /sys/firmware
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">/dev/loop0 5.3G 1.3G 3.7G 27% /home/edwin
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>You can ignore the overlay and tmpfs stuff, which is container voodoo.&lt;/p>
+&lt;p>The bits that matter:&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>Inside Cloud Shell, you have a classic Unix filesystem. Under the filesystem root &lt;code>/&lt;/code>, most everything is owned by root, and is not writable by the Cloud Shell user. This includes all the utility programs Cloud Shell ships.
+Even if you find some way to elevate privileges and update them, all the changes will be lost the next time you run Cloud Shell, because these are part of the container image, and are recreated every time you reconnect.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>There&amp;rsquo;s also your &amp;lsquo;cloud drive&amp;rsquo;, which is your Azure File Share mounted as a CIFS filesystem as &lt;code>/usr/csuser/clouddrive&lt;/code>. In this example, mine is in the file share &lt;code>cs-edyoung-microsoft-com-xxx&lt;/code> in the storage account &lt;code>csxxx.file.core.windows.net&lt;/code> There&amp;rsquo;s a symlink set up so that ~/clouddrive goes to the same location. Through that you can read and write files to the Azure file share.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Your home directory is different. It&amp;rsquo;s under &lt;code>/home/username&lt;/code> (mine is &lt;code>/home/edwin&lt;/code> ) and is writable. You can see that is a mount point for &lt;code>/dev/loop0&lt;/code>, which is a loopback filesystem. A loopback filesystem allows you to create a filesystem &lt;em>inside a file&lt;/em>. Where is that file? Inside your cloud drive fileshare, as a regular file &lt;code>.cloudconsole/acc_username.img&lt;/code>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">edwin@Azure:~$ ls -l ~/clouddrive/.cloudconsole/acc_edwin.img
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">-rwxrwxrwx &lt;span class="m">1&lt;/span> edwin edwin &lt;span class="m">5368709120&lt;/span> May &lt;span class="m">26&lt;/span> 06:25 /home/edwin/clouddrive/.cloudconsole/acc_edwin.img
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>You can see this is a 5GB file. Inside that file is an entire filesystem, which contains the files which you have stored in your home directory. &lt;strong>Don&amp;rsquo;t delete or modify that file, or you&amp;rsquo;ll lose whatever you have in your Cloud Shell home directory&lt;/strong>. Generally you should treat this file as opaque, but if you desperately want to you could download the file and mount it as a loopback device on a regular Linux box. If for some reason you &lt;em>want&lt;/em> to delete everything in your home directory, you could delete that file from the file share, and when you restart Cloud Shell we will create a new home directory file for you.&lt;/p>
+&lt;h2 id="ephemeral-storage">Ephemeral Storage
+&lt;/h2>&lt;p>If you are using Cloud Shell in ephemeral mode, then your home directory is just part of the container image, and everything in it will disappear when your session ends.&lt;/p></description></item><item><title>Azure Cloud Shell, az login, and Managed Identity</title><link>https://www.bathysphere.org/p/cloud-shell-auth/</link><pubDate>Fri, 19 Mar 2021 00:00:00 +0000</pubDate><guid>https://www.bathysphere.org/p/cloud-shell-auth/</guid><description>&lt;img src="https://www.bathysphere.org/p/cloud-shell-auth/agenda.png" alt="Featured image of post Azure Cloud Shell, az login, and Managed Identity" />&lt;p>When you open Azure Cloud Shell and run &lt;code>Get-AzVM&lt;/code> or &lt;code>az vm list&lt;/code> for the first time, it works right away. But why?&lt;/p>
+&lt;p>That may seem like an odd question. Of course it should work right away! But it doesn&amp;rsquo;t work quite the same way when you run PowerShell or Azure CLI locally - you need to run &lt;code>Connect-AzAccount&lt;/code> or &lt;code>az login&lt;/code> first. So what&amp;rsquo;s the difference?&lt;/p>
+&lt;p>A surprising amount of things are happening behind the scenes for this to work, and at the time of writing there are some limitations you might hit. This post tries to explain what is going on. If you just want to use Cloud Shell you don&amp;rsquo;t really need to know any of this.&lt;/p>
+&lt;h2 id="oauth">OAuth
+&lt;/h2>&lt;p>Within Azure, basically everything is authenticated using &lt;strong>OAuth&lt;/strong>. That&amp;rsquo;s a complicated beast I can&amp;rsquo;t explain here in detail. The docs &lt;a class="link" href="https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-vs-authorization" target="_blank" rel="noopener"
+>here&lt;/a> provide a reasonable starting point. For our purposes, the important thing is that you authenticate yourself first to Azure Active Directory when you open the Azure Portal. AAD checks your password/PIN+smart card/whatever and issues a &lt;strong>refresh token&lt;/strong>. This gets stored outside our scope in the browser - Cloud Shell never accesses it directly.&lt;/p>
+&lt;p>When you need to access a particular resource, you need an &lt;strong>access token&lt;/strong>. Given the refresh token, you ask AAD &amp;lsquo;hey, I want to access Azure Storage, can I have a token?&amp;rsquo;. AAD then sends you a short-lived token (usually lasting 1 hour) which can then be presented to Azure Storage; storage checks the signature on the token and uses that to check if you are legit.&lt;/p>
+&lt;p>But as I mentioned, in Cloud Shell we don&amp;rsquo;t have your refresh token, so how does this work?&lt;/p>
+&lt;h2 id="managed-identity">Managed Identity
+&lt;/h2>&lt;p>&lt;strong>Managed Identity&lt;/strong> is a cool scheme invented so that code which needs to access a resource doesn&amp;rsquo;t need to store (and worry about the security and rotation of) a password. The Azure fabric manages an identity and is configured so that any code that runs on a particular VM can ask an endpoint &amp;ldquo;Can I have an access token?&amp;rdquo;. I think of this as an ambient credential for the VM - we grant that machine access to resources and allow code running on it to get tokens without any extra hassle.&lt;/p>
+&lt;p>This works by having a special endpoint. If you&amp;rsquo;re on an Azure VM with a managed identity, you can run&lt;/p>
+&lt;p>&lt;code>curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&amp;amp;resource=https%3A%2F%2Fmanagement.azure.com%2F' -H Metadata:true&lt;/code>&lt;/p>
+&lt;p>and get a token, which is just a JSON blob looking a bit like this:&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;accessToken&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;eyJ0blah...&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;expiresOn&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2021-03-19 23:12:01.371124&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;subscription&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;b1071e00-5da5-49c8-b902-14951e12f37a&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;tenant&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;72f988bf-86f1-41af-91ab-2d7cd011db47&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;#34;tokenType&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Bearer&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="managed-identity-in-cloud-shell">Managed Identity in Cloud Shell
+&lt;/h2>&lt;p>In Cloud Shell you still want an &amp;lsquo;ambient&amp;rsquo; identity - you don&amp;rsquo;t want to sign on &lt;em>again&lt;/em>. But you don&amp;rsquo;t want a token that identifies you as the machine where Cloud Shell runs, you want one based on your own identity that you signed on to the portal with.&lt;/p>
+&lt;p>So we provide an alternative managed identity endpoint.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">curl &lt;span class="s1">&amp;#39;http://localhost:50342/metadata/identity/oauth2/token?api-version=2018-02-01&amp;amp;resource=https%3A%2F%2Fmanagement.azure.com%2F&amp;#39;&lt;/span> -H Metadata:true
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>Will give you an access token based on your own identity. Unlike Azure&amp;rsquo;s regular managed identity endpoint, this is implemented as another process running inside your container.
+When it gets a request, it actually sends the request back to your browser, which forwards it to the parent Portal frame, which makes a request to AAD, and the resulting token
+flows back down the same path.&lt;/p>
+&lt;h2 id="tool-considerations">Tool Considerations
+&lt;/h2>&lt;p>Client tools deal with this endpoint in different ways.&lt;/p>
+&lt;p>Azure PowerShell supports &lt;code>Connect-AzAccount -Identity&lt;/code> which tells it to use managed identity (whether Cloud Shell or regular); AZ CLI has &lt;code>az login --identity&lt;/code> for the same purpose. We run both during the Cloud Shell startup so you don&amp;rsquo;t have to.&lt;/p>
+&lt;p>You can also login explicitly, by running &lt;code>az login&lt;/code> or &lt;code>Connect-AzAccount&lt;/code>. That overrides this mechanism and can be used to (for example) use a different identity than the one you logged on to Cloud Shell with.&lt;/p>
+&lt;h2 id="limitations-and-issues">Limitations and Issues
+&lt;/h2>&lt;p>This works great most of the time, but there are a couple of snags you might run into.&lt;/p>
+&lt;ol>
+&lt;li>
+&lt;p>We have an allow-list of resources that we can provide tokens for (a limitation we hope to raise in future). This means that when someone introduces a brand new resource type for a new service, we have to update the list in Cloud Shell too. If you run a command and see something like this: &lt;code>&amp;quot;error&amp;quot;:{&amp;quot;code&amp;quot;:&amp;quot;AudienceNotSupported&amp;quot;,&amp;quot;message&amp;quot;:&amp;quot;Audience https://coolnewservice.azure.com/ is not a supported MSI token audience....&amp;quot;}&amp;quot;&lt;/code> you have hit this issue. Please feel free to file an issue at &lt;a class="link" href="https://github.com/Azure/CloudShell/issues" target="_blank" rel="noopener"
+>https://github.com/Azure/CloudShell/issues&lt;/a> and we&amp;rsquo;ll endeavor to add it as soon as we can.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>If you login explicitly (&lt;code>az login&lt;/code>) any Conditional Access rules your company may have in place will be evaluated based on the Cloud Shell container rather than the machine where your browser runs. The Cloud Shell container doesn&amp;rsquo;t count as a managed device for these policies so rights may be limited by the policy.&lt;/p>
+&lt;/li>
+&lt;/ol></description></item><item><title>How to install your own versions of tools in Azure Cloud Shell</title><link>https://www.bathysphere.org/p/cloud-shell-installs/</link><pubDate>Mon, 21 Sep 2020 18:11:06 -0700</pubDate><guid>https://www.bathysphere.org/p/cloud-shell-installs/</guid><description>&lt;img src="https://www.bathysphere.org/p/cloud-shell-installs/image.png" alt="Featured image of post How to install your own versions of tools in Azure Cloud Shell" />&lt;p>Cloud Shell comes with a lot of tools, and we try to keep them up to date. But sometimes you need something a little bit more cutting edge or unusual. How do you install it?&lt;/p>
+&lt;p>Using Cloud Shell is a little different from running your own Linux computer, but it&amp;rsquo;s a lot like using a multi-user Unix system.
+The main difference is &lt;strong>you are not root&lt;/strong> and we won&amp;rsquo;t tell you the root password (sorry).
+So anything that requires you to run &lt;code>sudo&lt;/code> or change files outside your home directory or /tmp won&amp;rsquo;t work. This includes old favorites like &lt;code>apt-get install&lt;/code>.&lt;/p>
+&lt;blockquote>
+&lt;p>Why? A tiny bit for security - we don&amp;rsquo;t want to make it any easier for people to break out of Cloud Shell than it needs to be - but
+mostly for consistency. In Cloud Shell the only things that persist across sessions are the contents of your home directory
+and clouddrive. If you manage to change files and install something under /usr/bin, it would magically be gone the next time you start
+Cloud Shell, and that wouldn&amp;rsquo;t be too helpful.&lt;/p>&lt;/blockquote>
+&lt;p>So the short version is, anything you can install to your home directory or below it will work just fine. Let&amp;rsquo;s look at some examples.&lt;/p>
+&lt;h2 id="powershell-modules">PowerShell modules
+&lt;/h2>&lt;p>Just install them with &lt;code>Install-Module&lt;/code>. By default, they will be saved to &lt;code>~/.local/share/powershell/Modules/&lt;/code>. Those will be loaded first
+in preference to ones that are installed in the system-wide directories, which can be good and bad. Mostly good, but consider this:&lt;/p>
+&lt;ol>
+&lt;li>Cloud Shell ships with AwesomeModule 1.0&lt;/li>
+&lt;li>You&amp;rsquo;re like &amp;ldquo;That&amp;rsquo;s old school, AwesomeModule 1.1 is way better&amp;rdquo;. &lt;code>Install-Module AwesomeModule -RequiredVersion 1.1&lt;/code> FTW!&lt;/li>
+&lt;li>Cloud Shell updates to AwesomeModule 2.0&lt;/li>
+&lt;li>You still wind up using AwesomeModule 1.1. Sadness.&lt;/li>
+&lt;/ol>
+&lt;p>This can be particularly tricky with the Azure PowerShell modules, because installing one of them brings along 10 others it depends on. You may want to periodically delete &lt;code>~/.local/share/powershell/Modules/&lt;/code> to be on the safe side.&lt;/p>
+&lt;h2 id="node-modules">Node Modules
+&lt;/h2>&lt;p>Just install them with &lt;code>npm install&lt;/code>. But &lt;code>npm install -g&lt;/code> tries to update &lt;code>/usr/local/lib/node_modules&lt;/code> which won&amp;rsquo;t work, so don&amp;rsquo;t do that.&lt;/p>
+&lt;h2 id="az-cli-and-extensions">AZ CLI and extensions
+&lt;/h2>&lt;p>You can install AZ CLI extensions with &lt;code>az extension add&lt;/code>. This saves the extension to a location in your home dir, and just works.&lt;/p>
+&lt;p>However updating the whole of AZ CLI is more difficult. I don&amp;rsquo;t have good instructions for doing that at the moment.&lt;/p>
+&lt;h2 id="random-executables-and-tools">Random Executables and tools
+&lt;/h2>&lt;p>If you have a favorite unix tool look for the &amp;ldquo;Manual Installation&amp;rdquo; instructions on its home page, those will usually work even if &lt;code>apt-get&lt;/code> does not. For example, we don&amp;rsquo;t have the GitHub CLI tool (at the time of writing anyway😉). If you look at &lt;a class="link" href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" target="_blank" rel="noopener"
+>https://github.com/cli/cli/blob/trunk/docs/install_linux.md&lt;/a> it starts with instructions about using apt-get which (sorry) won&amp;rsquo;t work. But under &amp;lsquo;Manual Instructions&amp;rsquo; it turns out you can just download &lt;a class="link" href="https://github.com/cli/cli/releases/download/v1.0.0/gh_1.0.0_linux_amd64.tar.gz" target="_blank" rel="noopener"
+>https://github.com/cli/cli/releases/download/v1.0.0/gh_1.0.0_linux_amd64.tar.gz&lt;/a> , unpack it and run it.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">wget https://github.com/cli/cli/releases/download/v1.0.0/gh_1.0.0_linux_amd64.tar.gz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tar xzvf gh_1.0.0_linux_amd64.tar.gz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gh_1.0.0_linux_amd64/bin/gh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The last bit points out one snag. You either need to run a program via its full path or add it to a directory in your $PATH. As with PowerShell modules,
+be aware that if your directory is earlier in the $PATH than the standard ones, if you shadow a tool that Cloud Shell installs you might not see future updates.&lt;/p>
+&lt;h2 id="terraform">Terraform
+&lt;/h2>&lt;p>Terraform basically falls under the &amp;lsquo;random executables bucket&amp;rsquo; but there are a few special considerations.&lt;/p>
+&lt;p>You can install it locally with&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">wget -O terraform.zip https://releases.hashicorp.com/terraform/0.13.2/terraform_0.13.2_linux_amd64.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">unzip terraform.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./terraform
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>But it won&amp;rsquo;t behave quite the same as the one in Cloud Shell. That&amp;rsquo;s because if you look at&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">edwin@Azure:~$ more /usr/local/bin/terraform
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#!/usr/bin/env bash&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">set&lt;/span> -e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_SUBSCRIPTION_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sb">`&lt;/span>az account show --output&lt;span class="o">=&lt;/span>json &lt;span class="p">|&lt;/span> jq -r -M &lt;span class="s1">&amp;#39;.id&amp;#39;&lt;/span>&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_TENANT_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sb">`&lt;/span>az account show --output&lt;span class="o">=&lt;/span>json &lt;span class="p">|&lt;/span> jq -r -M &lt;span class="s1">&amp;#39;.tenantId&amp;#39;&lt;/span>&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_MSI_ENDPOINT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$MSI_ENDPOINT&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="o">[&lt;/span> -z &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$ARM_MSI_ENDPOINT&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="o">]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_USE_MSI&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_USE_MSI&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">PATH&lt;/span>&lt;span class="o">=&lt;/span>/usr/local/terraform:&lt;span class="nv">$PATH&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">terraform &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$@&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>You can see it&amp;rsquo;s really a script where we set a couple environment variables so terraform works better in Cloud Shell. To get the benefit of those too, you need to copy the script to (say) &lt;code>~/terraform.sh&lt;/code> and
+edit it so it finds and runs your local terraform executable as well.&lt;/p></description></item></channel></rss>

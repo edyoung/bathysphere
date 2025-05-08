@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bash on Bathysphere.org</title><link>https://www.bathysphere.org/tags/bash/</link><description>Recent content in Bash on Bathysphere.org</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 21 Sep 2020 18:11:06 -0700</lastBuildDate><atom:link href="https://www.bathysphere.org/tags/bash/index.xml" rel="self" type="application/rss+xml"/><item><title>How to install your own versions of tools in Azure Cloud Shell</title><link>https://www.bathysphere.org/p/cloud-shell-installs/</link><pubDate>Mon, 21 Sep 2020 18:11:06 -0700</pubDate><guid>https://www.bathysphere.org/p/cloud-shell-installs/</guid><description>&lt;img src="https://www.bathysphere.org/p/cloud-shell-installs/image.png" alt="Featured image of post How to install your own versions of tools in Azure Cloud Shell" />&lt;p>Cloud Shell comes with a lot of tools, and we try to keep them up to date. But sometimes you need something a little bit more cutting edge or unusual. How do you install it?&lt;/p>
+&lt;p>Using Cloud Shell is a little different from running your own Linux computer, but it&amp;rsquo;s a lot like using a multi-user Unix system.
+The main difference is &lt;strong>you are not root&lt;/strong> and we won&amp;rsquo;t tell you the root password (sorry).
+So anything that requires you to run &lt;code>sudo&lt;/code> or change files outside your home directory or /tmp won&amp;rsquo;t work. This includes old favorites like &lt;code>apt-get install&lt;/code>.&lt;/p>
+&lt;blockquote>
+&lt;p>Why? A tiny bit for security - we don&amp;rsquo;t want to make it any easier for people to break out of Cloud Shell than it needs to be - but
+mostly for consistency. In Cloud Shell the only things that persist across sessions are the contents of your home directory
+and clouddrive. If you manage to change files and install something under /usr/bin, it would magically be gone the next time you start
+Cloud Shell, and that wouldn&amp;rsquo;t be too helpful.&lt;/p>&lt;/blockquote>
+&lt;p>So the short version is, anything you can install to your home directory or below it will work just fine. Let&amp;rsquo;s look at some examples.&lt;/p>
+&lt;h2 id="powershell-modules">PowerShell modules
+&lt;/h2>&lt;p>Just install them with &lt;code>Install-Module&lt;/code>. By default, they will be saved to &lt;code>~/.local/share/powershell/Modules/&lt;/code>. Those will be loaded first
+in preference to ones that are installed in the system-wide directories, which can be good and bad. Mostly good, but consider this:&lt;/p>
+&lt;ol>
+&lt;li>Cloud Shell ships with AwesomeModule 1.0&lt;/li>
+&lt;li>You&amp;rsquo;re like &amp;ldquo;That&amp;rsquo;s old school, AwesomeModule 1.1 is way better&amp;rdquo;. &lt;code>Install-Module AwesomeModule -RequiredVersion 1.1&lt;/code> FTW!&lt;/li>
+&lt;li>Cloud Shell updates to AwesomeModule 2.0&lt;/li>
+&lt;li>You still wind up using AwesomeModule 1.1. Sadness.&lt;/li>
+&lt;/ol>
+&lt;p>This can be particularly tricky with the Azure PowerShell modules, because installing one of them brings along 10 others it depends on. You may want to periodically delete &lt;code>~/.local/share/powershell/Modules/&lt;/code> to be on the safe side.&lt;/p>
+&lt;h2 id="node-modules">Node Modules
+&lt;/h2>&lt;p>Just install them with &lt;code>npm install&lt;/code>. But &lt;code>npm install -g&lt;/code> tries to update &lt;code>/usr/local/lib/node_modules&lt;/code> which won&amp;rsquo;t work, so don&amp;rsquo;t do that.&lt;/p>
+&lt;h2 id="az-cli-and-extensions">AZ CLI and extensions
+&lt;/h2>&lt;p>You can install AZ CLI extensions with &lt;code>az extension add&lt;/code>. This saves the extension to a location in your home dir, and just works.&lt;/p>
+&lt;p>However updating the whole of AZ CLI is more difficult. I don&amp;rsquo;t have good instructions for doing that at the moment.&lt;/p>
+&lt;h2 id="random-executables-and-tools">Random Executables and tools
+&lt;/h2>&lt;p>If you have a favorite unix tool look for the &amp;ldquo;Manual Installation&amp;rdquo; instructions on its home page, those will usually work even if &lt;code>apt-get&lt;/code> does not. For example, we don&amp;rsquo;t have the GitHub CLI tool (at the time of writing anyway😉). If you look at &lt;a class="link" href="https://github.com/cli/cli/blob/trunk/docs/install_linux.md" target="_blank" rel="noopener"
+>https://github.com/cli/cli/blob/trunk/docs/install_linux.md&lt;/a> it starts with instructions about using apt-get which (sorry) won&amp;rsquo;t work. But under &amp;lsquo;Manual Instructions&amp;rsquo; it turns out you can just download &lt;a class="link" href="https://github.com/cli/cli/releases/download/v1.0.0/gh_1.0.0_linux_amd64.tar.gz" target="_blank" rel="noopener"
+>https://github.com/cli/cli/releases/download/v1.0.0/gh_1.0.0_linux_amd64.tar.gz&lt;/a> , unpack it and run it.&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">wget https://github.com/cli/cli/releases/download/v1.0.0/gh_1.0.0_linux_amd64.tar.gz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">tar xzvf gh_1.0.0_linux_amd64.tar.gz
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gh_1.0.0_linux_amd64/bin/gh
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>The last bit points out one snag. You either need to run a program via its full path or add it to a directory in your $PATH. As with PowerShell modules,
+be aware that if your directory is earlier in the $PATH than the standard ones, if you shadow a tool that Cloud Shell installs you might not see future updates.&lt;/p>
+&lt;h2 id="terraform">Terraform
+&lt;/h2>&lt;p>Terraform basically falls under the &amp;lsquo;random executables bucket&amp;rsquo; but there are a few special considerations.&lt;/p>
+&lt;p>You can install it locally with&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">wget -O terraform.zip https://releases.hashicorp.com/terraform/0.13.2/terraform_0.13.2_linux_amd64.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">unzip terraform.zip
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">./terraform
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>But it won&amp;rsquo;t behave quite the same as the one in Cloud Shell. That&amp;rsquo;s because if you look at&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">edwin@Azure:~$ more /usr/local/bin/terraform
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">#!/usr/bin/env bash&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">set&lt;/span> -e
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_SUBSCRIPTION_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sb">`&lt;/span>az account show --output&lt;span class="o">=&lt;/span>json &lt;span class="p">|&lt;/span> jq -r -M &lt;span class="s1">&amp;#39;.id&amp;#39;&lt;/span>&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_TENANT_ID&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="sb">`&lt;/span>az account show --output&lt;span class="o">=&lt;/span>json &lt;span class="p">|&lt;/span> jq -r -M &lt;span class="s1">&amp;#39;.tenantId&amp;#39;&lt;/span>&lt;span class="sb">`&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_MSI_ENDPOINT&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$MSI_ENDPOINT&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="o">[&lt;/span> -z &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$ARM_MSI_ENDPOINT&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span> &lt;span class="o">]&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">then&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_USE_MSI&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">false&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nb">export&lt;/span> &lt;span class="nv">ARM_USE_MSI&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nb">true&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">fi&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nb">export&lt;/span> &lt;span class="nv">PATH&lt;/span>&lt;span class="o">=&lt;/span>/usr/local/terraform:&lt;span class="nv">$PATH&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">terraform &lt;span class="s2">&amp;#34;&lt;/span>&lt;span class="nv">$@&lt;/span>&lt;span class="s2">&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>You can see it&amp;rsquo;s really a script where we set a couple environment variables so terraform works better in Cloud Shell. To get the benefit of those too, you need to copy the script to (say) &lt;code>~/terraform.sh&lt;/code> and
+edit it so it finds and runs your local terraform executable as well.&lt;/p></description></item></channel></rss>
